@@ -1,0 +1,6 @@
+node_modules/
+state/game.json
+dist/
+build/
+*.log
+.DS_Store
