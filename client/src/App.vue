@@ -10,7 +10,6 @@
     <div v-else-if="!isConnected" class="loading">
       <div class="spinner"></div>
       <p>Connecting to server...</p>
-      <p class="debug">{{ connectionMessage }}</p>
     </div>
     <Lobby
       v-else-if="gamePhase === 'lobby'"
@@ -61,7 +60,6 @@ const gameState = ref<Game>({
 const playerId = ref<string>("");
 const gamePhase = ref<"lobby" | "game">("lobby");
 const isConnected = ref(false);
-const connectionMessage = ref("Initializing...");
 const error = ref<string | null>(null);
 const errorDetails = ref<string>("");
 const gameVersion = ref<string>("");
@@ -73,9 +71,6 @@ onMounted(() => {
   const port = window.location.port || (protocol === "wss:" ? "443" : "80");
   const socketUrl = `${protocol}//${host}:${port}`;
 
-  connectionMessage.value = `Connecting to ${socketUrl}...`;
-  console.log("Connecting to:", socketUrl);
-
   socket = io(socketUrl, {
     reconnection: true,
     reconnectionDelay: 1000,
@@ -85,45 +80,37 @@ onMounted(() => {
 
   socket.on("connect", () => {
     isConnected.value = true;
-    connectionMessage.value = `Connected, socket ID: ${socket.id}`;
     console.log("✓ Connected to server, socket ID:", socket.id);
 
     // Auto-rejoin if we have a saved player name (on initial join OR reconnect)
     const savedPlayerName = localStorage.getItem("playerName");
+    const savedVersion = localStorage.getItem("gameVersion");
     if (savedPlayerName) {
-      console.log("↻ Auto-rejoining/reconnecting as:", savedPlayerName);
-      socket.emit("JOIN", { name: savedPlayerName });
+      console.log("↻ Trying to rejoin as:", savedPlayerName);
+      socket.emit("JOIN", { playerName: savedPlayerName, playerVersion: savedVersion ?? undefined });
     }
   });
 
-  socket.on("PLAYER_JOINED", (payload: { name: string; playerId: string }) => {
+  socket.on("PLAYER_JOINED", (payload: { playerName: string; playerId: string, gameVersion: string }) => {
     playerId.value = payload.playerId;
-    localStorage.setItem("playerName", payload.name);
-    console.log(`✓ Player confirmed joined as: ${payload.name}, ID: ${playerId.value}`);
+    localStorage.setItem("playerName", payload.playerName);
+    console.log(`✓ Player confirmed joined as: ${payload.playerName}, ID: ${playerId.value}`);
   });
 
   socket.on("STATE_UPDATE", (state: Game) => {
     try {
       const savedVersion = localStorage.getItem("gameVersion");
-      const savedPlayerName = localStorage.getItem("playerName");
 
-      console.log("📡 STATE_UPDATE received, players:", state.players.length);
-
-      // Check if game version changed (server was reset)
       if (savedVersion && savedVersion !== state.version) {
-        console.warn("⚠️ Game version changed - clearing old player data");
         localStorage.removeItem("playerName");
         localStorage.removeItem("playerEntrepreneur");
         localStorage.setItem("gameVersion", state.version);
         gameVersion.value = state.version;
         gameState.value = state;
-        return; // Skip further processing since version changed
+        return;
       }
 
-      // Always save the current server version
       localStorage.setItem("gameVersion", state.version);
-
-      // Player rejoin is now handled by auto-join on connect and PLAYER_JOINED event
 
       gameVersion.value = state.version;
       gameState.value = state;
@@ -133,18 +120,24 @@ onMounted(() => {
     }
   });
 
+  socket.on("VERSION_MISMATCH", (payload: { version: string }) => {
+    console.warn("⚠️ Game version mismatch - server has a new game, clearing old player data");
+    localStorage.removeItem("playerName");
+    localStorage.removeItem("playerEntrepreneur");
+    localStorage.setItem("gameVersion", payload.version);
+    playerId.value = "";
+  });
+
   socket.on("REJECT_ACTION", (payload: { reason: string }) => {
     console.error("❌ Action rejected:", payload.reason);
     alert(`Action rejected: ${payload.reason}`);
   });
 
   socket.on("connect_error", (error: any) => {
-    connectionMessage.value = `Connection error: ${error.message || error}`;
     console.error("Connection error:", error);
   });
 
   socket.on("disconnect", () => {
-    connectionMessage.value = "Disconnected from server";
     isConnected.value = false;
     console.log("Disconnected from server");
   });
@@ -172,11 +165,9 @@ watch(
   { deep: true }
 );
 
-function handleJoin(name: string) {
+function handleJoin(playerName: string) {
   try {
-    console.log("Joining as:", name);
-    // localStorage will be set by PLAYER_JOINED event from server
-    socket.emit("JOIN", { name });
+    socket.emit("JOIN", { playerName: playerName, playerVersion: gameVersion.value || undefined });
   } catch (err) {
     console.error("Error during join:", err);
     error.value = "Failed to join game";

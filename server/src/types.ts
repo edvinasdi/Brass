@@ -3,18 +3,18 @@ export type Phase = "canal" | "rail";
 export type ActionType = "SPEND" | "LOAN" | "UNDO" | "END_ROUND";
 
 export interface Player {
-  playerId: string; // stable UUID, persists across reconnects
-  socketId: string; // current socket connection, transient
+  playerId: string;
+  socketId: string;
   name: string;
   entrepreneur: Entrepreneur | null;
   money: number;
-  spent: number; // spent this round
+  spent: number;
   connected: boolean;
 }
 
 export interface Action {
   type: ActionType;
-  playerId: string; // references Player.playerId
+  playerId: string;
   amount?: number;
   timestamp: number;
 }

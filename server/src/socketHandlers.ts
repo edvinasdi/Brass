@@ -9,25 +9,31 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
     // Send current game state to new client
     socket.emit("STATE_UPDATE", gameState.getGame());
 
-    socket.on("JOIN", (payload: { name: string }) => {
-      const { name } = payload;
-      if (!name || name.trim() === "") {
+    socket.on("JOIN", (payload: { playerName: string; playerVersion?: string }) => {
+      const { playerName, playerVersion } = payload;
+      if (!playerName || playerName.trim() === "") {
         socket.emit("REJECT_ACTION", { reason: "Invalid name" });
         return;
       }
 
+      var gameVersion = gameState.getGame().version;
+      if (playerVersion && playerVersion !== gameVersion) {
+        socket.emit("VERSION_MISMATCH", { gameVersion });
+        return;
+      }
+
       // Try to reassociate with existing player by name first
-      let player = gameState.reassociatePlayer(socket.id, name);
+      let player = gameState.reassociatePlayer(socket.id, playerName);
       if (!player) {
         // If not found, create a new player
-        player = gameState.addPlayer(socket.id, name);
-        console.log(`✓ New player joined: ${name}`);
+        player = gameState.addPlayer(socket.id, playerName);
+        console.log(`✓ New player joined: ${playerName}`);
       } else {
-        console.log(`↻ Player rejoined: ${name}`);
+        console.log(`↻ Player rejoined: ${playerName}`);
       }
 
       // Send the player info (including name and stable playerId) back to client
-      socket.emit("PLAYER_JOINED", { name: player.name, playerId: player.playerId });
+      socket.emit("PLAYER_JOINED", { playerName: player.name, playerId: player.playerId, gameVersion });
       io.emit("STATE_UPDATE", gameState.getGame());
     });
 
