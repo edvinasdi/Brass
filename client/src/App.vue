@@ -1,5 +1,6 @@
 <template>
-  <div class="app">
+  <Connect v-if="isConnectPage" />
+  <div v-else class="app">
     <div v-if="error" class="error-screen">
       <h1>❌ Error</h1>
       <p>{{ error }}</p>
@@ -43,6 +44,9 @@ import type { Socket } from "socket.io-client";
 import type { Game } from "./types";
 import Lobby from "./components/Lobby.vue";
 import GameView from "./components/Game.vue";
+import Connect from "./components/Connect.vue";
+
+const isConnectPage = window.location.pathname === "/connect";
 
 const gameState = ref<Game>({
   version: "",

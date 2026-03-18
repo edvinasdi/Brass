@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import path from "path";
+import { getConnectionInfo } from "./connectionInfo.js";
 import { GameState } from "./gameState.js";
 import { setupSocketHandlers } from "./socketHandlers.js";
 import { loadGameState, saveGameState } from "./persistence.js";
@@ -49,9 +50,18 @@ app.get("/api/status", (req, res) => {
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 
+app.get("/api/connection-info", (req, res) => {
+  res.json(getConnectionInfo(PORT));
+});
+
+// SPA fallback — must be after all API routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"));
+});
+
 httpServer.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server listening on port ${PORT}`);
-  console.log(`Connect to http://localhost:${PORT}`);
+  console.log(`Share page:  http://localhost:${PORT}/connect`);
+  console.log(`Players join: ${getConnectionInfo(PORT).preferredJoinUrl}`);
 });
 
 // Graceful shutdown
