@@ -10,6 +10,7 @@ export interface Player {
   money: number;
   spent: number;
   connected: boolean;
+  isAdmin: boolean;
 }
 
 export interface Action {

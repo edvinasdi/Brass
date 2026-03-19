@@ -50,21 +50,21 @@
       </div>
 
       <button
-        v-if="allPlayersReady && !gameStarted"
+        v-if="allPlayersReady && !gameStarted && amIAdmin"
         class="start-btn"
         @click="startGame"
       >
         Start Game (All Ready)
       </button>
       <button
-        v-else-if="gameState.players.length > 0 && myEntrepreneur && !gameStarted"
+        v-else-if="gameState.players.length > 0 && myEntrepreneur && !gameStarted && amIAdmin"
         class="start-btn"
         @click="startGame"
       >
         Start Game (Me Only)
       </button>
       <div v-else-if="!gameStarted" class="waiting-text">
-        {{ gameState.players.length === 0 ? "Waiting for players..." : "Choose your entrepreneur to start" }}
+        {{ gameState.players.length === 0 ? "Waiting for players..." : myEntrepreneur && !amIAdmin ? "Waiting for host to start..." : "Choose your entrepreneur to start" }}
       </div>
       
       <div class="debug-info">
@@ -139,6 +139,10 @@ const allPlayersReady = computed(() => {
     props.gameState.players.length > 0 &&
     props.gameState.players.every((p) => p.entrepreneur !== null)
   );
+});
+
+const amIAdmin = computed(() => {
+  return props.gameState.players.find((p) => p.playerId === props.playerId)?.isAdmin ?? false;
 });
 
 const gameStarted = computed(() => {

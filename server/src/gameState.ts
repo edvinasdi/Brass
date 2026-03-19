@@ -47,13 +47,12 @@ export class GameState {
       money: 30, // starting money
       spent: 0,
       connected: true,
+      isAdmin: false,
     };
 
     this.game.players.push(player);
     return player;
   }
-
-
 
   removePlayer(socketId: string): void {
     const player = this.game.players.find((p) => p.socketId === socketId);
@@ -74,7 +73,18 @@ export class GameState {
     return this.game.players.find((p) => p.name === name);
   }
 
-  // Reassociate a disconnected player with a new socket connection
+  setAdmin(playerId: string): boolean {
+    const player = this.getPlayer(playerId);
+    if (!player) return false;
+
+    // Clear any existing admin first
+    this.game.players.forEach((p) => {
+      p.isAdmin = false;
+    });
+    player.isAdmin = true;
+    return true;
+  }
+
   // Stable playerId stays the same, only socketId changes
   reassociatePlayer(newSocketId: string, name: string): Player | null {
     const existingPlayer = this.getPlayerByName(name);

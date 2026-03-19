@@ -127,6 +127,12 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
     });
 
     socket.on("START_GAME", () => {
+      const requestingPlayer = gameState.getPlayerBySocketId(socket.id);
+      if (!requestingPlayer?.isAdmin) {
+        socket.emit("REJECT_ACTION", { reason: "Only the admin can start the game" });
+        return;
+      }
+
       // Check if all players claimed entrepreneurs
       const allClaimed = gameState.getGame().players.every((p) => p.entrepreneur);
       if (!allClaimed) {

@@ -9,7 +9,8 @@
     "debug": "tsx watch --inspect src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "reset": "rm -f state/game.json && echo '✓ Game state cleared'"
+    "reset": "rm -f state/game.json && echo '✓ Game state cleared'",
+    "set-admin": "tsx scripts/set-admin.ts"
   },
   "keywords": ["brass", "money", "tracker"],
   "author": "",
