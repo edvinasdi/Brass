@@ -125,6 +125,7 @@ export class GameState {
     this.game.actionHistory.push({
       type: "SPEND",
       playerId,
+      playerName: player.name,
       amount,
       timestamp: Date.now(),
     });
@@ -143,6 +144,7 @@ export class GameState {
     this.game.actionHistory.push({
       type: "LOAN",
       playerId,
+      playerName: player.name,
       amount,
       timestamp: Date.now(),
     });

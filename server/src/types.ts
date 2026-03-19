@@ -15,6 +15,7 @@ export interface Player {
 export interface Action {
   type: ActionType;
   playerId: string;
+  playerName: string;
   amount?: number;
   timestamp: number;
 }
