@@ -92,10 +92,10 @@ function pressConfirm() {
 /* ── Sheet ──────────────────────────────────────────────── */
 .so-sheet {
   width: 100%;
-  background: #1a1a1a;
+  background: #1e1a14;
   border-radius: 16px 16px 0 0;
   padding: 0.5rem 1rem 1.5rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid #3d2a0e;
 }
 
 /* ── Header ─────────────────────────────────────────────── */
@@ -112,14 +112,15 @@ function pressConfirm() {
   text-align: right;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #e0e0e0;
+  color: #d4c5a9;
 }
 
 .so-title {
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: #888;
+  color: #7a6040;
+  font-family: 'Cinzel', serif;
 }
 
 .so-close {
@@ -172,9 +173,9 @@ function pressConfirm() {
   padding: 1rem 0;
   font-size: 1.4rem;
   font-weight: 600;
-  background: #242424;
-  color: #e0e0e0;
-  border: 1px solid #333;
+  background: #1a1612;
+  color: #d4c5a9;
+  border: 1px solid #3d2a0e;
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.1s;
@@ -183,7 +184,7 @@ function pressConfirm() {
 }
 
 .so-key:active {
-  background: #333;
+  background: #2a2218;
 }
 
 .so-key-back {
@@ -201,14 +202,14 @@ function pressConfirm() {
 }
 
 .so-key-confirm {
-  background: #c8960a;
-  color: #000;
+  background: #c9a84c;
+  color: #0f0b08;
   font-size: 1.5rem;
-  border-color: #c8960a;
+  border-color: #c9a84c;
 }
 
 .so-key-confirm:not(:disabled):active {
-  background: #a87c08;
+  background: #a8893a;
 }
 
 .so-key-confirm:disabled {

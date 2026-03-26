@@ -8,7 +8,7 @@ html,
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
-  background: #1a1a1a;
+  background: #0f0b08;
   color: #fff;
   height: 100%;
   overflow: hidden;
@@ -46,10 +46,10 @@ input[type="text"],
 input[type="number"] {
   padding: 0.75rem;
   font-size: 1rem;
-  border: 1px solid #444;
+  border: 1px solid #5c3d1e;
   border-radius: 8px;
-  background: #2a2a2a;
-  color: #fff;
+  background: #1e1a14;
+  color: #d4c5a9;
 }
 
 input[type="text"]::placeholder,

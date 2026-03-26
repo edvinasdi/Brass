@@ -168,13 +168,15 @@ function startGame() {
 h1 {
   font-size: 3rem;
   margin-bottom: 0.5rem;
-  color: #ffb81c;
+  color: #c9a84c;
+  font-family: 'Cinzel', serif;
 }
 
 h2 {
   font-size: 1.5rem;
   margin-bottom: 2rem;
-  color: #aaa;
+  color: #8a7a5a;
+  font-family: 'Cinzel', serif;
 }
 
 .join-section {
@@ -205,6 +207,8 @@ label {
 
 h3 {
   font-size: 1.5rem;
+  font-family: 'Cinzel', serif;
+  color: #c9a84c;
 }
 
 .entrepreneur-grid {
@@ -220,12 +224,13 @@ h3 {
   gap: 0.5rem;
   padding: 1rem;
   font-size: 1rem;
-  border: 2px solid #444;
+  border: 2px solid #5c3d1e;
   border-radius: 8px;
-  background: #2a2a2a;
-  color: white;
+  background: #1e1a14;
+  color: #d4c5a9;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: 'Cinzel', serif;
 }
 
 .entrepreneur-btn .circle {
@@ -251,12 +256,12 @@ h3 {
 }
 
 .entrepreneur-btn:hover:not(:disabled) {
-  border-color: #fff;
+  border-color: #c9a84c;
 }
 
 .entrepreneur-btn.selected {
-  border-color: #fff;
-  background: #3a3a3a;
+  border-color: #c9a84c;
+  background: #2a2218;
 }
 
 .entrepreneur-btn:disabled {
@@ -270,6 +275,8 @@ h3 {
 
 h4 {
   margin-bottom: 0.5rem;
+  font-family: 'Cinzel', serif;
+  color: #8a7a5a;
 }
 
 .players-list ul {
@@ -284,8 +291,9 @@ h4 {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: #2a2a2a;
+  background: #1e1a14;
   border-radius: 4px;
+  border: 1px solid #3d2a0e;
 }
 
 .entrepreneur {
@@ -299,25 +307,26 @@ h4 {
 }
 
 .start-btn {
-  background: #27ae60;
+  background: #1e5c38;
   margin-top: 1rem;
+  font-family: 'Cinzel', serif;
 }
 
 .start-btn:hover {
-  background: #229954;
+  background: #17472c;
 }
 
 .waiting-text {
-  color: #999;
+  color: #7a6040;
   font-style: italic;
 }
 
 .debug-info {
   margin-top: 2rem;
   padding: 1rem;
-  background: #222;
+  background: #161210;
   border-radius: 4px;
-  color: #666;
+  color: #5a4a30;
   font-size: 0.85rem;
   text-align: center;
 }

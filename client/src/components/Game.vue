@@ -111,15 +111,15 @@ function endTurn() {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #111;
+  background: #0f0b08;
 }
 
 /* ── Top bar ────────────────────────────────────────────── */
 .top-bar {
   flex-shrink: 0;
   padding: 0.6rem 1.25rem;
-  background: #111;
-  border-bottom: 1px solid #2a2a2a;
+  background: #0f0b08;
+  border-bottom: 1px solid #3d2a0e;
   text-align: right;
   font-size: 0.75rem;
   font-weight: 700;
@@ -127,11 +127,12 @@ function endTurn() {
 }
 
 .turn-label {
-  color: #888;
+  color: #7a6040;
+  font-family: 'Cinzel', serif;
 }
 
 .turn-label.my-turn {
-  color: #f4a62a;
+  color: #c9a84c;
 }
 
 /* ── Player list ────────────────────────────────────────── */
@@ -149,9 +150,9 @@ function endTurn() {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  background: #1a1a1a;
+  background: #1e1a14;
   border-radius: 8px;
-  border: 1px solid #2a2a2a;
+  border: 1px solid #3d2a0e;
   transition: border-color 0.15s;
 }
 
@@ -178,19 +179,21 @@ function endTurn() {
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #e0e0e0;
+  color: #d4c5a9;
+  font-family: 'Cinzel', serif;
 }
 
 .you-label {
   font-size: 0.7rem;
-  color: #666;
+  color: #5a4a30;
   font-style: italic;
 }
 
 .card-right {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #fff;
+  color: #e8d5a3;
+  font-family: 'Cinzel', serif;
 }
 
 /* ── Bottom bar ─────────────────────────────────────────── */
@@ -203,8 +206,8 @@ function endTurn() {
     "undo loan loan end-turn";
   gap: 0.5rem;
   padding: 0.75rem;
-  background: #111;
-  border-top: 1px solid #2a2a2a;
+  background: #0f0b08;
+  border-top: 1px solid #3d2a0e;
 }
 
 
@@ -218,6 +221,7 @@ function endTurn() {
   border: none;
   cursor: pointer;
   transition: background 0.15s;
+  font-family: 'Cinzel', serif;
 }
 
 .bar-btn:disabled {
@@ -227,40 +231,44 @@ function endTurn() {
 
 .spend-btn {
   grid-area: spend;
-  background: #c8960a;
-  color: #000;
+  background: #c9a84c;
+  color: #0f0b08;
+}
+
+.spend-btn:not(:disabled):hover {
+  background: #d4b660;
 }
 
 .loan-btn {
   grid-area: loan;
-  background: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #444;
+  background: #1e1a14;
+  color: #d4c5a9;
+  border: 1px solid #5c3d1e;
 }
 
 .loan-btn:not(:disabled):hover {
-  background: #333;
+  background: #2a2218;
 }
 
 .undo-btn {
   grid-area: undo;
-  background: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #444;
+  background: #1e1a14;
+  color: #d4c5a9;
+  border: 1px solid #5c3d1e;
   font-size: 1rem;
 }
 
 .undo-btn:not(:disabled):hover {
-  background: #333;
+  background: #2a2218;
 }
 
 .end-turn-btn {
   grid-area: end-turn;
-  background: #2563eb;
-  color: #fff;
+  background: #1e3a5f;
+  color: #c5d8f0;
 }
 
 .end-turn-btn:not(:disabled):hover {
-  background: #1d4ed8;
+  background: #162d4a;
 }
 </style>
