@@ -34,8 +34,8 @@
 
     <div class="bottom-bar">
       <button class="bar-btn spend-btn" :disabled="!isMyTurn" @click="showSpend = true">SPEND</button>
-      <button class="bar-btn loan-btn" :disabled="!isMyTurn" @click="takeLoan">LOAN +£30</button>
       <button class="bar-btn undo-btn" :disabled="!isMyTurn || gameState.actionHistory.length === 0" @click="undo">↩</button>
+      <button class="bar-btn loan-btn" :disabled="!isMyTurn" @click="takeLoan">LOAN +£30</button>
       <button class="bar-btn end-turn-btn" :disabled="!isMyTurn" @click="endTurn">END TURN</button>
     </div>
   </div>
@@ -197,12 +197,17 @@ function endTurn() {
 .bottom-bar {
   flex-shrink: 0;
   display: grid;
-  grid-template-columns: 1.2fr 1.2fr 0.5fr 1.2fr;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-areas:
+    "spend spend spend spend"
+    "undo loan loan end-turn";
   gap: 0.5rem;
   padding: 0.75rem;
   background: #111;
   border-top: 1px solid #2a2a2a;
 }
+
+
 
 .bar-btn {
   padding: 1.25rem 0.5rem;
@@ -221,11 +226,13 @@ function endTurn() {
 }
 
 .spend-btn {
+  grid-area: spend;
   background: #c8960a;
   color: #000;
 }
 
 .loan-btn {
+  grid-area: loan;
   background: #2a2a2a;
   color: #e0e0e0;
   border: 1px solid #444;
@@ -236,6 +243,7 @@ function endTurn() {
 }
 
 .undo-btn {
+  grid-area: undo;
   background: #2a2a2a;
   color: #e0e0e0;
   border: 1px solid #444;
@@ -247,6 +255,7 @@ function endTurn() {
 }
 
 .end-turn-btn {
+  grid-area: end-turn;
   background: #2563eb;
   color: #fff;
 }
