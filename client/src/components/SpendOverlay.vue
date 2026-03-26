@@ -13,17 +13,8 @@
             {{ inputStr === "" ? "0" : inputStr }}
           </div>
 
-          <div class="so-presets">
-            <button
-              v-for="amount in PRESETS"
-              :key="amount"
-              class="so-preset-btn"
-              @click="pressPreset(amount)"
-            >£{{ amount }}</button>
-          </div>
-
           <div class="so-numpad">
-            <button v-for="n in [1,2,3,4,5,6,7,8,9]" :key="n" class="so-key" @click="pressDigit(n)">
+            <button v-for="n in [7,8,9,4,5,6,1,2,3]" :key="n" class="so-key" @click="pressDigit(n)">
               {{ n }}
             </button>
             <button class="so-key so-key-back" @click="pressBackspace">⌫</button>
@@ -56,8 +47,6 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-const PRESETS = [1, 5, 15] as const;
-
 const inputStr = ref("");
 
 const amount = computed(() => {
@@ -81,10 +70,6 @@ function pressDigit(d: number) {
 
 function pressBackspace() {
   inputStr.value = inputStr.value.slice(0, -1);
-}
-
-function pressPreset(n: number) {
-  inputStr.value = String(n);
 }
 
 function pressConfirm() {
@@ -176,32 +161,6 @@ function pressConfirm() {
   color: #e8453c;
 }
 
-/* ── Preset chips ───────────────────────────────────────── */
-.so-presets {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.so-preset-btn {
-  flex: 1;
-  padding: 0.5rem 0;
-  font-size: 0.85rem;
-  font-weight: 700;
-  background: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #444;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.so-preset-btn:hover,
-.so-preset-btn:active {
-  background: #383838;
-}
-
 /* ── Numpad ─────────────────────────────────────────────── */
 .so-numpad {
   display: grid;
@@ -230,6 +189,15 @@ function pressConfirm() {
 .so-key-back {
   color: #aaa;
   font-size: 1.2rem;
+}
+
+.so-key-clear {
+  color: #e8453c;
+  border-color: #6b2020;
+}
+
+.so-key-clear:active {
+  background: #2a1515;
 }
 
 .so-key-confirm {
