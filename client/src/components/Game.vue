@@ -1,5 +1,12 @@
 <template>
   <div class="game">
+    <SpendOverlay
+      :visible="showSpend"
+      :balance="myBalance"
+      @confirm="handleSpend"
+      @cancel="showSpend = false"
+    />
+
     <div class="top-bar">
       <span v-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
       <span v-else class="turn-label">{{ getPlayerName(gameState.currentTurn).toUpperCase() }}'S TURN</span>
@@ -26,7 +33,7 @@
     </div>
 
     <div class="bottom-bar">
-      <button class="bar-btn spend-btn" disabled>SPEND</button>
+      <button class="bar-btn spend-btn" :disabled="!isMyTurn" @click="showSpend = true">SPEND</button>
       <button class="bar-btn loan-btn" :disabled="!isMyTurn" @click="takeLoan">LOAN +£30</button>
       <button class="bar-btn undo-btn" :disabled="!isMyTurn || gameState.actionHistory.length === 0" @click="undo">↩</button>
       <button class="bar-btn end-turn-btn" :disabled="!isMyTurn" @click="endTurn">END TURN</button>
@@ -35,8 +42,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { Game, Entrepreneur } from "../types";
+import SpendOverlay from "./SpendOverlay.vue";
 
 interface Props {
   gameState: Game;
@@ -53,8 +61,15 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const showSpend = ref(false);
+
 const isMyTurn = computed(() => {
   return props.gameState.currentTurn === props.playerId;
+});
+
+const myBalance = computed(() => {
+  const me = props.gameState.players.find((p) => p.playerId === props.playerId);
+  return me ? me.money : 0;
 });
 
 const ENTREPRENEUR_COLORS: Record<Entrepreneur, string> = {
@@ -71,6 +86,11 @@ function entrepreneurColor(e: Entrepreneur | null): string {
 function getPlayerName(playerId: string): string {
   const player = props.gameState.players.find((p) => p.playerId === playerId);
   return player ? player.name : "Unknown";
+}
+
+function handleSpend(amount: number) {
+  emit("spend", amount);
+  showSpend.value = false;
 }
 
 function takeLoan() {
@@ -185,7 +205,7 @@ function endTurn() {
 }
 
 .bar-btn {
-  padding: 0.75rem 0.5rem;
+  padding: 1.25rem 0.5rem;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
