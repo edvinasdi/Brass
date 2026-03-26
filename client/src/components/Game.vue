@@ -9,7 +9,7 @@
 
     <div class="top-bar">
       <span v-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
-      <span v-else class="turn-label">{{ getPlayerName(gameState.currentTurn).toUpperCase() }}'S TURN</span>
+      <span v-else class="turn-label">WAITING FOR {{ getPlayerName(gameState.currentTurn).toUpperCase() }}...</span>
     </div>
 
     <div class="player-list">
