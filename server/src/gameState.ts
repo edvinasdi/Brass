@@ -44,7 +44,7 @@ export class GameState {
       socketId, // transient connection ID
       name,
       entrepreneur: null,
-      money: 30, // starting money
+      money: 17, // starting money
       spent: 0,
       connected: true,
       isAdmin: false,
