@@ -24,7 +24,6 @@
           <div class="player-name-block">
             <span class="player-name">{{ player.name.toUpperCase() }}</span>
             <span class="player-money">£{{ player.money }}</span>
-            <span v-if="player.playerId === playerId" class="you-label">(you)</span>
           </div>
         </div>
         <div class="card-right">
