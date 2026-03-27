@@ -28,4 +28,5 @@ export interface Game {
   round: number;
   phase: Phase;
   actionHistory: Action[];
+  roundEnded: boolean; // true when all players have ended their turn, awaiting admin to start next round
 }

@@ -115,13 +115,33 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
     });
 
     socket.on("END_TURN", () => {
-      // Host-only action validation can be added here
+      const player = gameState.getPlayerBySocketId(socket.id);
+      if (!player) {
+        socket.emit("REJECT_ACTION", { reason: "Player not found" });
+        return;
+      }
+      if (gameState.getGame().roundEnded) {
+        socket.emit("REJECT_ACTION", { reason: "Round has ended — waiting for admin to start next round" });
+        return;
+      }
+      if (gameState.getGame().currentTurn !== player.playerId) {
+        socket.emit("REJECT_ACTION", { reason: "Not your turn" });
+        return;
+      }
       gameState.endTurn();
       io.emit("STATE_UPDATE", gameState.getGame());
     });
 
     socket.on("END_ROUND", () => {
-      // Host-only action validation can be added here
+      const player = gameState.getPlayerBySocketId(socket.id);
+      if (!player?.isAdmin) {
+        socket.emit("REJECT_ACTION", { reason: "Only the admin can start the next round" });
+        return;
+      }
+      if (!gameState.getGame().roundEnded) {
+        socket.emit("REJECT_ACTION", { reason: "Round has not ended yet" });
+        return;
+      }
       gameState.endRound();
       io.emit("STATE_UPDATE", gameState.getGame());
     });

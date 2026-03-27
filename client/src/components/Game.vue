@@ -8,13 +8,15 @@
     />
 
     <div class="top-bar">
-      <span v-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
+      <span v-if="isRoundEnded && isAdmin" class="turn-label my-turn">ALL TURNS COMPLETE</span>
+      <span v-else-if="isRoundEnded" class="turn-label">WAITING FOR {{ adminName.toUpperCase() }} TO START NEXT ROUND</span>
+      <span v-else-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
       <span v-else class="turn-label">WAITING FOR {{ getPlayerName(gameState.currentTurn).toUpperCase() }}...</span>
     </div>
 
     <div class="player-list">
       <div
-        v-for="player in gameState.players"
+        v-for="player in orderedPlayers"
         :key="player.playerId"
         class="player-card"
         :style="player.playerId === gameState.currentTurn ? { borderColor: entrepreneurColor(player.entrepreneur), borderWidth: '2px', borderStyle: 'solid' } : {}"
@@ -30,7 +32,10 @@
       </div>
     </div>
 
-    <div class="bottom-bar">
+    <div v-if="isRoundEnded && isAdmin" class="bottom-bar bottom-bar--round-end">
+      <button class="bar-btn start-round-btn" @click="endRound">START ROUND {{ gameState.round + 1 }}</button>
+    </div>
+    <div v-else class="bottom-bar">
       <button class="bar-btn spend-btn" :disabled="!isMyTurn" @click="showSpend = true">SPEND</button>
       <button class="bar-btn undo-btn" :disabled="!isMyTurn || gameState.actionHistory.length === 0" @click="undo">↩</button>
       <button class="bar-btn loan-btn" :disabled="!isMyTurn" @click="takeLoan">LOAN +£30</button>
@@ -54,6 +59,7 @@ interface Emits {
   (e: "loan", amount: number): void;
   (e: "undo"): void;
   (e: "end-turn"): void;
+  (e: "end-round"): void;
 }
 
 const props = defineProps<Props>();
@@ -63,6 +69,26 @@ const showSpend = ref(false);
 
 const isMyTurn = computed(() => {
   return props.gameState.currentTurn === props.playerId;
+});
+
+const isRoundEnded = computed(() => props.gameState.roundEnded);
+
+const isAdmin = computed(() => {
+  const me = props.gameState.players.find((p) => p.playerId === props.playerId);
+  return me ? me.isAdmin : false;
+});
+
+const adminName = computed(() => {
+  const admin = props.gameState.players.find((p) => p.isAdmin);
+  return admin ? admin.name : "Admin";
+});
+
+const orderedPlayers = computed(() => {
+  const order = props.gameState.turnOrder;
+  if (order.length === 0) return props.gameState.players;
+  return [...props.gameState.players].sort(
+    (a, b) => order.indexOf(a.playerId) - order.indexOf(b.playerId)
+  );
 });
 
 const myBalance = computed(() => {
@@ -101,6 +127,10 @@ function undo() {
 
 function endTurn() {
   emit("end-turn");
+}
+
+function endRound() {
+  emit("end-round");
 }
 </script>
 
@@ -274,5 +304,21 @@ function endTurn() {
 
 .end-turn-btn:not(:disabled):hover {
   background: #162d4a;
+}
+
+/* ── Round-end bar (admin only) ─────────────────────────── */
+.bottom-bar--round-end {
+  display: flex;
+}
+
+.start-round-btn {
+  flex: 1;
+  background: #1a3a1a;
+  color: #90e090;
+  border: 1px solid #2e6e2e;
+}
+
+.start-round-btn:hover {
+  background: #1e4a1e;
 }
 </style>

@@ -13,6 +13,7 @@ export class GameState {
       round: 1,
       phase: "canal",
       actionHistory: [],
+      roundEnded: false,
     };
   }
 
@@ -22,6 +23,7 @@ export class GameState {
     state.game = {
       ...data,
       version: data.version || state.game.version, // Ensure version always exists
+      roundEnded: data.roundEnded ?? false,
     };
     return state;
   }
@@ -195,22 +197,32 @@ export class GameState {
   endTurn(): void {
     const currentIndex = this.game.turnOrder.indexOf(this.game.currentTurn);
     const nextIndex = (currentIndex + 1) % this.game.turnOrder.length;
-    this.game.currentTurn = this.game.turnOrder[nextIndex];
+    if (nextIndex === 0) {
+      // All players have taken their turn — pause for admin to start next round
+      this.game.roundEnded = true;
+      this.game.currentTurn = "";
+    } else {
+      this.game.currentTurn = this.game.turnOrder[nextIndex];
+    }
   }
 
   endRound(): void {
-    // Reset spent, reorder turn
+    this.game.roundEnded = false;
+
+    // Sort by spent ascending (least spent goes first next round) before resetting.
+    // Tiebreak: preserve current round's turn order position.
+    const players = [...this.game.players].sort((a, b) => {
+      const spentDiff = a.spent - b.spent;
+      if (spentDiff !== 0) return spentDiff;
+      return this.game.turnOrder.indexOf(a.playerId) - this.game.turnOrder.indexOf(b.playerId);
+    });
+    this.game.turnOrder = players.map((p) => p.playerId);
+
+    // Reset spent after determining order
     this.game.players.forEach((p) => {
       p.spent = 0;
     });
 
-    const players = [...this.game.players];
-    for (let i = players.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [players[i], players[j]] = [players[j], players[i]];
-    }
-
-    this.game.turnOrder = players.map((p) => p.playerId);
     this.game.currentTurn = this.game.turnOrder[0];
     this.game.round += 1;
   }

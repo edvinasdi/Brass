@@ -25,6 +25,7 @@
       @loan="handleLoan"
       @undo="handleUndo"
       @end-turn="handleEndTurn"
+      @end-round="handleEndRound"
       :game-state="gameState"
       :player-id="playerId"
     />
@@ -55,6 +56,7 @@ const gameState = ref<Game>({
   round: 1,
   phase: "canal",
   actionHistory: [],
+  roundEnded: false,
 });
 
 const playerId = ref<string>("");
@@ -151,7 +153,7 @@ watch(
       console.log("Game state changed:", state);
       if (
         state.turnOrder.length > 0 &&
-        state.currentTurn &&
+        (state.currentTurn || state.roundEnded) &&
         state.players.length > 0
       ) {
         console.log("Switching to game phase");
@@ -239,6 +241,16 @@ function handleEndTurn() {
   } catch (err) {
     console.error("Error ending turn:", err);
     error.value = "Failed to end turn";
+    errorDetails.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+function handleEndRound() {
+  try {
+    socket.emit("END_ROUND");
+  } catch (err) {
+    console.error("Error starting next round:", err);
+    error.value = "Failed to start next round";
     errorDetails.value = err instanceof Error ? err.message : String(err);
   }
 }
