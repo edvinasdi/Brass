@@ -26,8 +26,7 @@
             <span class="player-money">£{{ player.money }}</span>
           </div>
         </div>
-        <div class="card-right">
-        </div>
+        <div class="card-right">£{{ player.spent }}</div>
       </div>
     </div>
 
