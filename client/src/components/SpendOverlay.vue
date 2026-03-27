@@ -112,7 +112,7 @@ function pressConfirm() {
   text-align: right;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #d4c5a9;
+  color: #f0e8d8;
 }
 
 .so-title {
@@ -174,7 +174,7 @@ function pressConfirm() {
   font-size: 1.4rem;
   font-weight: 600;
   background: #1a1612;
-  color: #d4c5a9;
+  color: #f0e8d8;
   border: 1px solid #3d2a0e;
   border-radius: 10px;
   cursor: pointer;

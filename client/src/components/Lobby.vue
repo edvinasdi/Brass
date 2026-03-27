@@ -175,7 +175,7 @@ h1 {
 h2 {
   font-size: 1.5rem;
   margin-bottom: 2rem;
-  color: #8a7a5a;
+  color: #a09070;
   font-family: 'Cinzel', serif;
 }
 
@@ -227,7 +227,7 @@ h3 {
   border: 2px solid #5c3d1e;
   border-radius: 8px;
   background: #1e1a14;
-  color: #d4c5a9;
+  color: #f0e8d8;
   cursor: pointer;
   transition: all 0.2s;
   font-family: 'Cinzel', serif;
@@ -276,7 +276,7 @@ h3 {
 h4 {
   margin-bottom: 0.5rem;
   font-family: 'Cinzel', serif;
-  color: #8a7a5a;
+  color: #a09070;
 }
 
 .players-list ul {
@@ -317,7 +317,7 @@ h4 {
 }
 
 .waiting-text {
-  color: #7a6040;
+  color: #8a7060;
   font-style: italic;
 }
 

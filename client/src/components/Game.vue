@@ -23,11 +23,11 @@
           <span class="entrepreneur-dot" :style="{ background: entrepreneurColor(player.entrepreneur) }"></span>
           <div class="player-name-block">
             <span class="player-name">{{ player.name.toUpperCase() }}</span>
+            <span class="player-money">£{{ player.money }}</span>
             <span v-if="player.playerId === playerId" class="you-label">(you)</span>
           </div>
         </div>
         <div class="card-right">
-          <span class="player-money">£{{ player.money }}</span>
         </div>
       </div>
     </div>
@@ -127,7 +127,7 @@ function endTurn() {
 }
 
 .turn-label {
-  color: #7a6040;
+  color: #a09070;
   font-family: 'Cinzel', serif;
 }
 
@@ -171,28 +171,34 @@ function endTurn() {
 
 .player-name-block {
   display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .player-name {
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #d4c5a9;
+  color: #f0e8d8;
   font-family: 'Cinzel', serif;
 }
 
 .you-label {
   font-size: 0.7rem;
-  color: #5a4a30;
+  color: #8a7060;
   font-style: italic;
+}
+
+.player-money {
+  font-size: 0.75rem;
+  color: #a09070;
+  font-family: 'Cinzel', serif;
 }
 
 .card-right {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #e8d5a3;
+  color: #f5edd8;
   font-family: 'Cinzel', serif;
 }
 
@@ -242,7 +248,7 @@ function endTurn() {
 .loan-btn {
   grid-area: loan;
   background: #1e1a14;
-  color: #d4c5a9;
+  color: #f0e8d8;
   border: 1px solid #5c3d1e;
 }
 
@@ -253,7 +259,7 @@ function endTurn() {
 .undo-btn {
   grid-area: undo;
   background: #1e1a14;
-  color: #d4c5a9;
+  color: #f0e8d8;
   border: 1px solid #5c3d1e;
   font-size: 1rem;
 }
