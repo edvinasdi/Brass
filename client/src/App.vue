@@ -22,7 +22,9 @@
     <GameView
       v-else-if="gamePhase === 'game'"
       @spend="handleSpend"
-      @loan="handleLoan"
+      @loan-request="handleLoanRequest"
+      @loan-approve="handleLoanApprove"
+      @loan-reject="handleLoanReject"
       @undo="handleUndo"
       @end-turn="handleEndTurn"
       @end-round="handleEndRound"
@@ -58,6 +60,7 @@ const gameState = ref<Game>({
   currentTurnActionHistory: [],
   gameHistory: [],
   roundEnded: false,
+  pendingLoanRequest: null,
 });
 
 const playerId = ref<string>("");
@@ -216,12 +219,32 @@ function handleSpend(amount: number) {
   }
 }
 
-function handleLoan(amount: number) {
+function handleLoanRequest(amount: number) {
   try {
-    socket.emit("LOAN", { amount });
+    socket.emit("LOAN_REQUEST", { amount });
   } catch (err) {
-    console.error("Error taking loan:", err);
-    error.value = "Failed to take loan";
+    console.error("Error requesting loan:", err);
+    error.value = "Failed to request loan";
+    errorDetails.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+function handleLoanApprove() {
+  try {
+    socket.emit("LOAN_APPROVE");
+  } catch (err) {
+    console.error("Error approving loan:", err);
+    error.value = "Failed to approve loan";
+    errorDetails.value = err instanceof Error ? err.message : String(err);
+  }
+}
+
+function handleLoanReject() {
+  try {
+    socket.emit("LOAN_REJECT");
+  } catch (err) {
+    console.error("Error rejecting loan:", err);
+    error.value = "Failed to reject loan";
     errorDetails.value = err instanceof Error ? err.message : String(err);
   }
 }

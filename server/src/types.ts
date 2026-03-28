@@ -1,6 +1,6 @@
 export type Entrepreneur = "red" | "blue" | "yellow" | "purple";
 export type Phase = "canal" | "rail";
-export type ActionType = "SPEND" | "LOAN" | "UNDO" | "END_ROUND";
+export type ActionType = "SPEND" | "LOAN" | "LOAN_REQUEST" | "UNDO" | "END_ROUND";
 
 export interface Player {
   playerId: string;
@@ -31,4 +31,5 @@ export interface Game {
   currentTurnActionHistory: Action[]; // cleared on endTurn; used for undo
   gameHistory: Action[]; // full audit log, never cleared
   roundEnded: boolean; // true when all players have ended their turn, awaiting admin to start next round
+  pendingLoanRequest: { playerId: string; playerName: string; amount: number } | null;
 }

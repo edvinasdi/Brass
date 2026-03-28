@@ -80,7 +80,7 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
       io.emit("STATE_UPDATE", gameState.getGame());
     });
 
-    socket.on("LOAN", (payload: { amount: number }) => {
+    socket.on("LOAN_REQUEST", (payload: { amount: number }) => {
       const { amount } = payload;
       const player = gameState.getPlayerBySocketId(socket.id);
       if (!player) {
@@ -93,11 +93,76 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
         return;
       }
 
-      const success = gameState.loan(player.playerId, amount);
-
-      if (!success) {
+      if (gameState.getGame().currentTurn !== player.playerId) {
         socket.emit("REJECT_ACTION", { reason: "Not your turn" });
         return;
+      }
+
+      if (gameState.getGame().pendingLoanRequest !== null) {
+        socket.emit("REJECT_ACTION", { reason: "A loan request is already pending" });
+        return;
+      }
+
+      // If the requesting player is also the admin, auto-approve
+      if (player.isAdmin) {
+        const success = gameState.loan(player.playerId, amount);
+        if (!success) {
+          socket.emit("REJECT_ACTION", { reason: "Failed to apply loan" });
+          return;
+        }
+      } else {
+        const success = gameState.requestLoan(player.playerId, amount);
+        if (!success) {
+          socket.emit("REJECT_ACTION", { reason: "Failed to create loan request" });
+          return;
+        }
+      }
+
+      io.emit("STATE_UPDATE", gameState.getGame());
+    });
+
+    socket.on("LOAN_APPROVE", () => {
+      const player = gameState.getPlayerBySocketId(socket.id);
+      if (!player?.isAdmin) {
+        socket.emit("REJECT_ACTION", { reason: "Only the admin can approve loans" });
+        return;
+      }
+
+      if (!gameState.getGame().pendingLoanRequest) {
+        socket.emit("REJECT_ACTION", { reason: "No pending loan request" });
+        return;
+      }
+
+      const success = gameState.approveLoan();
+      if (!success) {
+        socket.emit("REJECT_ACTION", { reason: "Failed to approve loan" });
+        return;
+      }
+
+      io.emit("STATE_UPDATE", gameState.getGame());
+    });
+
+    socket.on("LOAN_REJECT", () => {
+      const player = gameState.getPlayerBySocketId(socket.id);
+      if (!player?.isAdmin) {
+        socket.emit("REJECT_ACTION", { reason: "Only the admin can reject loans" });
+        return;
+      }
+
+      if (!gameState.getGame().pendingLoanRequest) {
+        socket.emit("REJECT_ACTION", { reason: "No pending loan request" });
+        return;
+      }
+
+      const requestingPlayerId = gameState.rejectLoan();
+      if (requestingPlayerId) {
+        const requestingPlayer = gameState.getPlayer(requestingPlayerId);
+        if (requestingPlayer) {
+          const requestingSocket = [...io.sockets.sockets.values()].find(
+            (s) => s.id === requestingPlayer.socketId
+          );
+          requestingSocket?.emit("REJECT_ACTION", { reason: "Loan request rejected by admin" });
+        }
       }
 
       io.emit("STATE_UPDATE", gameState.getGame());

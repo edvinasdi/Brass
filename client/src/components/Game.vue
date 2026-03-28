@@ -13,6 +13,12 @@
       @confirm="handleIncomeConfirm"
       @cancel="showIncome = false"
     />
+    <LoanOverlay
+      :visible="showLoan"
+      :is-pending="pendingIsMe"
+      @confirm="handleLoanRequest"
+      @cancel="showLoan = false"
+    />
 
     <div class="top-bar">
       <span v-if="isRoundEnded && isAdmin" class="turn-label my-turn">ALL TURNS COMPLETE</span>
@@ -39,23 +45,31 @@
       </div>
     </div>
 
-    <div v-if="isRoundEnded && isAdmin" class="bottom-bar bottom-bar--round-end">
-      <button class="bar-btn start-round-btn" @click="showIncome = true">START ROUND {{ gameState.round + 1 }}</button>
-    </div>
-    <div v-else class="bottom-bar">
-      <button class="bar-btn spend-btn" :disabled="!isMyTurn" @click="showSpend = true">SPEND</button>
-      <button class="bar-btn undo-btn" :disabled="!canUndo" @click="undo">↩</button>
-      <button class="bar-btn loan-btn" :disabled="!isMyTurn" @click="takeLoan">LOAN +£30</button>
-      <button class="bar-btn end-turn-btn" :disabled="!isMyTurn" @click="endTurn">END TURN</button>
-    </div>
+    <BottomBar
+      :mode="bottomBarMode"
+      :is-my-turn="isMyTurn"
+      :can-undo="canUndo"
+      :loan-pending="!!gameState.pendingLoanRequest"
+      :round="gameState.round"
+      :loan-request-label="loanRequestLabel"
+      @spend="showSpend = true"
+      @undo="emit('undo')"
+      @loan="showLoan = true"
+      @end-turn="emit('end-turn')"
+      @start-round="showIncome = true"
+      @loan-approve="emit('loan-approve')"
+      @loan-reject="emit('loan-reject')"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { Game, Entrepreneur } from "../types";
 import SpendOverlay from "./SpendOverlay.vue";
 import IncomeOverlay from "./IncomeOverlay.vue";
+import LoanOverlay from "./LoanOverlay.vue";
+import BottomBar from "./BottomBar.vue";
 
 interface Props {
   gameState: Game;
@@ -64,7 +78,9 @@ interface Props {
 
 interface Emits {
   (e: "spend", amount: number): void;
-  (e: "loan", amount: number): void;
+  (e: "loan-request", amount: number): void;
+  (e: "loan-approve"): void;
+  (e: "loan-reject"): void;
   (e: "undo"): void;
   (e: "end-turn"): void;
   (e: "end-round", payouts: Record<string, number>): void;
@@ -75,6 +91,36 @@ const emit = defineEmits<Emits>();
 
 const showSpend = ref(false);
 const showIncome = ref(false);
+const showLoan = ref(false);
+
+const pendingIsMe = computed(
+  () => props.gameState.pendingLoanRequest?.playerId === props.playerId
+);
+
+const pendingLoanForAdmin = computed(
+  () =>
+    isAdmin.value &&
+    props.gameState.pendingLoanRequest !== null &&
+    props.gameState.pendingLoanRequest.playerId !== props.playerId
+);
+
+const bottomBarMode = computed((): "game" | "round-end" | "loan-approval" => {
+  if (isRoundEnded.value && isAdmin.value) return "round-end";
+  if (pendingLoanForAdmin.value) return "loan-approval";
+  return "game";
+});
+
+const loanRequestLabel = computed(() => {
+  const req = props.gameState.pendingLoanRequest;
+  return req ? `${req.playerName.toUpperCase()} REQUESTS A LOAN OF £${req.amount}` : "";
+});
+
+// When pending clears (approved or rejected via REJECT_ACTION), close the LoanOverlay
+watch(pendingIsMe, (nowPending, wasPending) => {
+  if (wasPending && !nowPending) {
+    showLoan.value = false;
+  }
+});
 
 const isMyTurn = computed(() => {
   return props.gameState.currentTurn === props.playerId;
@@ -130,16 +176,11 @@ function handleSpend(amount: number) {
   showSpend.value = false;
 }
 
-function takeLoan() {
-  emit("loan", 30);
-}
-
-function undo() {
-  emit("undo");
-}
-
-function endTurn() {
-  emit("end-turn");
+function handleLoanRequest() {
+  emit("loan-request", 30);
+  if (isAdmin.value) {
+    showLoan.value = false;
+  }
 }
 
 function handleIncomeConfirm(payouts: Record<string, number>) {
@@ -246,95 +287,5 @@ function handleIncomeConfirm(payouts: Record<string, number>) {
   font-family: 'Cinzel', serif;
 }
 
-/* ── Bottom bar ─────────────────────────────────────────── */
-.bottom-bar {
-  flex-shrink: 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-areas:
-    "spend spend spend spend"
-    "undo loan loan end-turn";
-  gap: 0.5rem;
-  padding: 0.75rem;
-  background: #0f0b08;
-  border-top: 1px solid #3d2a0e;
-}
-
-
-
-.bar-btn {
-  padding: 1.25rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s;
-  font-family: 'Cinzel', serif;
-}
-
-.bar-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.spend-btn {
-  grid-area: spend;
-  background: #c9a84c;
-  color: #0f0b08;
-}
-
-.spend-btn:not(:disabled):hover {
-  background: #d4b660;
-}
-
-.loan-btn {
-  grid-area: loan;
-  background: #1e1a14;
-  color: #f0e8d8;
-  border: 1px solid #5c3d1e;
-}
-
-.loan-btn:not(:disabled):hover {
-  background: #2a2218;
-}
-
-.undo-btn {
-  grid-area: undo;
-  background: #1e1a14;
-  color: #f0e8d8;
-  border: 1px solid #5c3d1e;
-  font-size: 1rem;
-}
-
-.undo-btn:not(:disabled):hover {
-  background: #2a2218;
-}
-
-.end-turn-btn {
-  grid-area: end-turn;
-  background: #1e3a5f;
-  color: #c5d8f0;
-}
-
-.end-turn-btn:not(:disabled):hover {
-  background: #162d4a;
-}
-
-/* ── Round-end bar (admin only) ─────────────────────────── */
-.bottom-bar--round-end {
-  display: flex;
-}
-
-.start-round-btn {
-  flex: 1;
-  background: #1a3a1a;
-  color: #90e090;
-  border: 1px solid #2e6e2e;
-}
-
-.start-round-btn:hover {
-  background: #1e4a1e;
-}
+/* bottom-bar styles live in BottomBar.vue */
 </style>

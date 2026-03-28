@@ -15,6 +15,7 @@ export class GameState {
       currentTurnActionHistory: [],
       gameHistory: [],
       roundEnded: false,
+      pendingLoanRequest: null,
     };
   }
 
@@ -27,6 +28,7 @@ export class GameState {
       roundEnded: data.roundEnded ?? false,
       currentTurnActionHistory: data.currentTurnActionHistory ?? [],
       gameHistory: data.gameHistory ?? [],
+      pendingLoanRequest: data.pendingLoanRequest ?? null,
     };
     return state;
   }
@@ -169,6 +171,35 @@ export class GameState {
     this.game.gameHistory.push(action);
 
     return true;
+  }
+
+  requestLoan(playerId: string, amount: number): boolean {
+    if (this.game.currentTurn !== playerId) return false;
+    if (this.game.pendingLoanRequest !== null) return false;
+
+    const player = this.getPlayer(playerId);
+    if (!player) return false;
+
+    this.game.pendingLoanRequest = { playerId, playerName: player.name, amount };
+    return true;
+  }
+
+  approveLoan(): boolean {
+    const pending = this.game.pendingLoanRequest;
+    if (!pending) return false;
+
+    const success = this.loan(pending.playerId, pending.amount);
+    this.game.pendingLoanRequest = null;
+    return success;
+  }
+
+  rejectLoan(): string | null {
+    const pending = this.game.pendingLoanRequest;
+    if (!pending) return null;
+
+    const requestingPlayerId = pending.playerId;
+    this.game.pendingLoanRequest = null;
+    return requestingPlayerId;
   }
 
   undo(playerId: string): boolean {
