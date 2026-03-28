@@ -12,7 +12,8 @@ export class GameState {
       currentTurn: "",
       round: 1,
       phase: "canal",
-      actionHistory: [],
+      currentTurnActionHistory: [],
+      gameHistory: [],
       roundEnded: false,
     };
   }
@@ -24,6 +25,8 @@ export class GameState {
       ...data,
       version: data.version || state.game.version, // Ensure version always exists
       roundEnded: data.roundEnded ?? false,
+      currentTurnActionHistory: data.currentTurnActionHistory ?? [],
+      gameHistory: data.gameHistory ?? [],
     };
     return state;
   }
@@ -134,13 +137,15 @@ export class GameState {
     player.money -= amount;
     player.spent += amount;
 
-    this.game.actionHistory.push({
-      type: "SPEND",
+    const action = {
+      type: "SPEND" as const,
       playerId,
       playerName: player.name,
       amount,
       timestamp: Date.now(),
-    });
+    };
+    this.game.currentTurnActionHistory.push(action);
+    this.game.gameHistory.push(action);
 
     return true;
   }
@@ -153,21 +158,24 @@ export class GameState {
 
     player.money += amount;
 
-    this.game.actionHistory.push({
-      type: "LOAN",
+    const action = {
+      type: "LOAN" as const,
       playerId,
       playerName: player.name,
       amount,
       timestamp: Date.now(),
-    });
+    };
+    this.game.currentTurnActionHistory.push(action);
+    this.game.gameHistory.push(action);
 
     return true;
   }
 
-  undo(): boolean {
-    if (this.game.actionHistory.length === 0) return false;
+  undo(playerId: string): boolean {
+    if (this.game.currentTurn !== playerId) return false;
+    if (this.game.currentTurnActionHistory.length === 0) return false;
 
-    const lastAction = this.game.actionHistory.pop()!;
+    const lastAction = this.game.currentTurnActionHistory.pop()!;
     const player = this.getPlayer(lastAction.playerId);
     if (!player) return false;
 
@@ -177,6 +185,14 @@ export class GameState {
     } else if (lastAction.type === "LOAN" && lastAction.amount) {
       player.money -= lastAction.amount;
     }
+
+    this.game.gameHistory.push({
+      type: "UNDO",
+      playerId,
+      playerName: player.name,
+      amount: lastAction.amount,
+      timestamp: Date.now(),
+    });
 
     return true;
   }
@@ -195,6 +211,7 @@ export class GameState {
   }
 
   endTurn(): void {
+    this.game.currentTurnActionHistory = [];
     const currentIndex = this.game.turnOrder.indexOf(this.game.currentTurn);
     const nextIndex = (currentIndex + 1) % this.game.turnOrder.length;
     if (nextIndex === 0) {
@@ -208,6 +225,7 @@ export class GameState {
 
   endRound(payouts: Record<string, number>): void {
     this.game.roundEnded = false;
+    this.game.currentTurnActionHistory = [];
 
     // Sort by spent ascending (least spent goes first next round) before resetting.
     // Tiebreak: preserve current round's turn order position.

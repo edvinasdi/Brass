@@ -104,7 +104,13 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
     });
 
     socket.on("UNDO", () => {
-      const success = gameState.undo();
+      const player = gameState.getPlayerBySocketId(socket.id);
+      if (!player) {
+        socket.emit("REJECT_ACTION", { reason: "Player not found" });
+        return;
+      }
+
+      const success = gameState.undo(player.playerId);
 
       if (!success) {
         socket.emit("REJECT_ACTION", { reason: "Nothing to undo" });

@@ -27,6 +27,7 @@ export interface Game {
   currentTurn: string;
   round: number;
   phase: Phase;
-  actionHistory: Action[];
+  currentTurnActionHistory: Action[]; // cleared on endTurn; used for undo
+  gameHistory: Action[]; // full audit log, never cleared
   roundEnded: boolean; // true when all players have ended their turn, awaiting admin to start next round
 }

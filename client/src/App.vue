@@ -55,7 +55,8 @@ const gameState = ref<Game>({
   currentTurn: "",
   round: 1,
   phase: "canal",
-  actionHistory: [],
+  currentTurnActionHistory: [],
+  gameHistory: [],
   roundEnded: false,
 });
 

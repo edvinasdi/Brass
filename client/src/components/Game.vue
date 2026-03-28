@@ -32,10 +32,10 @@
           <span class="entrepreneur-dot" :style="{ background: entrepreneurColor(player.entrepreneur) }"></span>
           <div class="player-name-block">
             <span class="player-name">{{ player.name.toUpperCase() }}</span>
-            <span class="player-money">£{{ player.money }}</span>
+            <span class="player-money">£ {{ player.money }}</span>
           </div>
         </div>
-        <div class="card-right">£{{ player.spent }}</div>
+        <div class="card-right">£ {{ player.spent }}</div>
       </div>
     </div>
 
@@ -44,7 +44,7 @@
     </div>
     <div v-else class="bottom-bar">
       <button class="bar-btn spend-btn" :disabled="!isMyTurn" @click="showSpend = true">SPEND</button>
-      <button class="bar-btn undo-btn" :disabled="!isMyTurn || gameState.actionHistory.length === 0" @click="undo">↩</button>
+      <button class="bar-btn undo-btn" :disabled="!canUndo" @click="undo">↩</button>
       <button class="bar-btn loan-btn" :disabled="!isMyTurn" @click="takeLoan">LOAN +£30</button>
       <button class="bar-btn end-turn-btn" :disabled="!isMyTurn" @click="endTurn">END TURN</button>
     </div>
@@ -81,6 +81,10 @@ const isMyTurn = computed(() => {
 });
 
 const isRoundEnded = computed(() => props.gameState.roundEnded);
+
+const canUndo = computed(() => {
+  return isMyTurn.value && props.gameState.currentTurnActionHistory.length > 0;
+});
 
 const isAdmin = computed(() => {
   const me = props.gameState.players.find((p) => p.playerId === props.playerId);
@@ -221,16 +225,18 @@ function handleIncomeConfirm(payouts: Record<string, number>) {
   font-family: 'Cinzel', serif;
 }
 
+.player-money {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  color: #a09070;
+  font-family: 'Cinzel', serif;
+}
+
 .you-label {
   font-size: 0.7rem;
   color: #8a7060;
   font-style: italic;
-}
-
-.player-money {
-  font-size: 0.75rem;
-  color: #a09070;
-  font-family: 'Cinzel', serif;
 }
 
 .card-right {
