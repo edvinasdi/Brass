@@ -21,11 +21,15 @@
     />
 
     <div class="top-bar">
-      <span class="round-label">Round {{ gameState.round }}</span>
-      <span v-if="isRoundEnded && isAdmin" class="turn-label my-turn">ALL TURNS COMPLETE</span>
-      <span v-else-if="isRoundEnded" class="turn-label">WAITING FOR {{ adminName.toUpperCase() }} TO START NEXT ROUND...</span>
-      <span v-else-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
-      <span v-else class="turn-label">WAITING FOR {{ getPlayerName(gameState.currentTurn).toUpperCase() }}...</span>
+      <div class="top-bar-row">
+        <span class="round-label">{{ gameState.phase.toUpperCase() }} ERA • ROUND {{ gameState.round }}</span>
+      </div>
+      <div class="top-bar-row top-bar-row--right">
+        <span v-if="isRoundEnded && isAdmin" class="turn-label my-turn">ALL TURNS COMPLETE</span>
+        <span v-else-if="isRoundEnded" class="turn-label">WAITING FOR {{ adminName.toUpperCase() }} TO START NEXT ROUND...</span>
+        <span v-else-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
+        <span v-else class="turn-label">WAITING FOR {{ getPlayerName(gameState.currentTurn).toUpperCase() }}...</span>
+      </div>
     </div>
 
     <div class="player-list">
@@ -201,25 +205,35 @@ function handleIncomeConfirm(payouts: Record<string, number>) {
 /* ── Top bar ────────────────────────────────────────────── */
 .top-bar {
   flex-shrink: 0;
-  padding: 0.6rem 1.25rem;
+  padding: 0.4rem 1.25rem;
   background: #0f0b08;
   border-bottom: 1px solid #3d2a0e;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
 
+.top-bar-row {
+  display: flex;
+}
+
+.top-bar-row--right {
+  justify-content: flex-end;
+}
+
 .round-label {
   color: #6b5a3e;
   font-family: 'Cinzel', serif;
+  white-space: nowrap;
 }
 
 .turn-label {
   color: #a09070;
   font-family: 'Cinzel', serif;
+  white-space: nowrap;
 }
 
 .turn-label.my-turn {
