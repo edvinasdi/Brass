@@ -1,38 +1,28 @@
 <template>
-  <Teleport to="body">
-    <div v-if="visible" class="so-backdrop" @click.self="emit('cancel')">
-      <Transition name="slide-up" appear>
-        <div class="so-sheet">
-          <div class="so-header">
-            <span class="so-title">SPEND</span>
-            <span class="so-balance">Balance: £{{ balance }}</span>
-            <button class="so-close" @click="emit('cancel')">✕</button>
-          </div>
+  <BottomSheet :visible="visible" title="SPEND" @cancel="emit('cancel')">
+    <template #header-right>
+      <span class="so-balance">Balance: £{{ balance }}</span>
+    </template>
 
-          <div class="so-amount" :class="{ overdrawn: isOverdrawn }">
-            {{ inputStr === "" ? "0" : inputStr }}
-          </div>
-
-          <div class="so-numpad">
-            <button v-for="n in [7,8,9,4,5,6,1,2,3]" :key="n" class="so-key" @click="pressDigit(n)">
-              {{ n }}
-            </button>
-            <button class="so-key so-key-back" @click="pressBackspace">⌫</button>
-            <button class="so-key" @click="pressDigit(0)">0</button>
-            <button
-              class="so-key so-key-confirm"
-              :disabled="!canConfirm"
-              @click="pressConfirm"
-            >✓</button>
-          </div>
-        </div>
-      </Transition>
+    <div class="so-amount" :class="{ overdrawn: isOverdrawn }">
+      {{ inputStr === "" ? "0" : inputStr }}
     </div>
-  </Teleport>
+
+    <Numpad
+      action-label="✓"
+      action-variant="confirm"
+      :action-disabled="!canConfirm"
+      @digit="pressDigit"
+      @backspace="pressBackspace"
+      @action="pressConfirm"
+    />
+  </BottomSheet>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
+import BottomSheet from "./BottomSheet.vue";
+import Numpad from "./Numpad.vue";
 
 interface Props {
   visible: boolean;
@@ -79,63 +69,12 @@ function pressConfirm() {
 </script>
 
 <style scoped>
-/* ── Backdrop ───────────────────────────────────────────── */
-.so-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 100;
-  display: flex;
-  align-items: flex-end;
-}
-
-/* ── Sheet ──────────────────────────────────────────────── */
-.so-sheet {
-  width: 100%;
-  background: #1e1a14;
-  border-radius: 16px 16px 0 0;
-  padding: 0.5rem 1rem 1.5rem;
-  border-top: 1px solid #3d2a0e;
-}
-
-/* ── Header ─────────────────────────────────────────────── */
-.so-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  padding-top: 0.4rem;
-}
-
 .so-balance {
   flex: 1;
   text-align: right;
   font-size: 0.85rem;
   font-weight: 700;
   color: #f0e8d8;
-}
-
-.so-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #7a6040;
-  font-family: 'Cinzel', serif;
-}
-
-.so-close {
-  background: none;
-  border: none;
-  color: #555;
-  font-size: 1rem;
-  line-height: 1;
-  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.so-close:hover {
-  color: #aaa;
 }
 
 /* ── Amount display ─────────────────────────────────────── */
@@ -162,69 +101,5 @@ function pressConfirm() {
   color: #e8453c;
 }
 
-/* ── Numpad ─────────────────────────────────────────────── */
-.so-numpad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
-
-.so-key {
-  padding: 1rem 0;
-  font-size: 1.4rem;
-  font-weight: 600;
-  background: #1a1612;
-  color: #f0e8d8;
-  border: 1px solid #3d2a0e;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.1s;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.so-key:active {
-  background: #2a2218;
-}
-
-.so-key-back {
-  color: #aaa;
-  font-size: 1.2rem;
-}
-
-.so-key-clear {
-  color: #e8453c;
-  border-color: #6b2020;
-}
-
-.so-key-clear:active {
-  background: #2a1515;
-}
-
-.so-key-confirm {
-  background: #c9a84c;
-  color: #0f0b08;
-  font-size: 1.5rem;
-  border-color: #c9a84c;
-}
-
-.so-key-confirm:not(:disabled):active {
-  background: #a8893a;
-}
-
-.so-key-confirm:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-/* ── Slide-up transition ────────────────────────────────── */
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-.slide-up-enter-from,
-.slide-up-leave-to {
-  transform: translateY(100%);
-}
+/* numpad styles live in Numpad.vue */
 </style>

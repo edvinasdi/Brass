@@ -6,6 +6,13 @@
       @confirm="handleSpend"
       @cancel="showSpend = false"
     />
+    <IncomeOverlay
+      :visible="showIncome"
+      :players="orderedPlayers"
+      :round="gameState.round"
+      @confirm="handleIncomeConfirm"
+      @cancel="showIncome = false"
+    />
 
     <div class="top-bar">
       <span v-if="isRoundEnded && isAdmin" class="turn-label my-turn">ALL TURNS COMPLETE</span>
@@ -33,7 +40,7 @@
     </div>
 
     <div v-if="isRoundEnded && isAdmin" class="bottom-bar bottom-bar--round-end">
-      <button class="bar-btn start-round-btn" @click="endRound">START ROUND {{ gameState.round + 1 }}</button>
+      <button class="bar-btn start-round-btn" @click="showIncome = true">START ROUND {{ gameState.round + 1 }}</button>
     </div>
     <div v-else class="bottom-bar">
       <button class="bar-btn spend-btn" :disabled="!isMyTurn" @click="showSpend = true">SPEND</button>
@@ -48,6 +55,7 @@
 import { computed, ref } from "vue";
 import type { Game, Entrepreneur } from "../types";
 import SpendOverlay from "./SpendOverlay.vue";
+import IncomeOverlay from "./IncomeOverlay.vue";
 
 interface Props {
   gameState: Game;
@@ -59,13 +67,14 @@ interface Emits {
   (e: "loan", amount: number): void;
   (e: "undo"): void;
   (e: "end-turn"): void;
-  (e: "end-round"): void;
+  (e: "end-round", payouts: Record<string, number>): void;
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const showSpend = ref(false);
+const showIncome = ref(false);
 
 const isMyTurn = computed(() => {
   return props.gameState.currentTurn === props.playerId;
@@ -129,8 +138,9 @@ function endTurn() {
   emit("end-turn");
 }
 
-function endRound() {
-  emit("end-round");
+function handleIncomeConfirm(payouts: Record<string, number>) {
+  emit("end-round", payouts);
+  showIncome.value = false;
 }
 </script>
 

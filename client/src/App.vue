@@ -245,9 +245,9 @@ function handleEndTurn() {
   }
 }
 
-function handleEndRound() {
+function handleEndRound(payouts: Record<string, number>) {
   try {
-    socket.emit("END_ROUND");
+    socket.emit("END_ROUND", { payouts });
   } catch (err) {
     console.error("Error starting next round:", err);
     error.value = "Failed to start next round";

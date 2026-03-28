@@ -206,7 +206,7 @@ export class GameState {
     }
   }
 
-  endRound(): void {
+  endRound(payouts: Record<string, number>): void {
     this.game.roundEnded = false;
 
     // Sort by spent ascending (least spent goes first next round) before resetting.
@@ -218,8 +218,9 @@ export class GameState {
     });
     this.game.turnOrder = players.map((p) => p.playerId);
 
-    // Reset spent after determining order
+    // Apply income payouts and reset spent
     this.game.players.forEach((p) => {
+      p.money += payouts[p.playerId] ?? 0;
       p.spent = 0;
     });
 

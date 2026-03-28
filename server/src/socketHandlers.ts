@@ -132,7 +132,7 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
       io.emit("STATE_UPDATE", gameState.getGame());
     });
 
-    socket.on("END_ROUND", () => {
+    socket.on("END_ROUND", (payload: { payouts: Record<string, number> }) => {
       const player = gameState.getPlayerBySocketId(socket.id);
       if (!player?.isAdmin) {
         socket.emit("REJECT_ACTION", { reason: "Only the admin can start the next round" });
@@ -142,7 +142,19 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
         socket.emit("REJECT_ACTION", { reason: "Round has not ended yet" });
         return;
       }
-      gameState.endRound();
+      const payouts = payload?.payouts;
+      if (!payouts || typeof payouts !== "object") {
+        socket.emit("REJECT_ACTION", { reason: "Invalid payouts" });
+        return;
+      }
+      for (const p of gameState.getGame().players) {
+        const amount = payouts[p.playerId];
+        if (!Number.isInteger(amount) || amount < 0) {
+          socket.emit("REJECT_ACTION", { reason: `Invalid payout for ${p.name}` });
+          return;
+        }
+      }
+      gameState.endRound(payouts);
       io.emit("STATE_UPDATE", gameState.getGame());
     });
 
