@@ -59,6 +59,7 @@ const emit = defineEmits<Emits>();
 }
 
 .bs-title {
+  flex: 1;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.1em;
