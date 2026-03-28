@@ -21,8 +21,9 @@
     />
 
     <div class="top-bar">
+      <span class="round-label">Round {{ gameState.round }}</span>
       <span v-if="isRoundEnded && isAdmin" class="turn-label my-turn">ALL TURNS COMPLETE</span>
-      <span v-else-if="isRoundEnded" class="turn-label">WAITING FOR {{ adminName.toUpperCase() }} TO START NEXT ROUND</span>
+      <span v-else-if="isRoundEnded" class="turn-label">WAITING FOR {{ adminName.toUpperCase() }} TO START NEXT ROUND...</span>
       <span v-else-if="isMyTurn" class="turn-label my-turn">YOUR TURN</span>
       <span v-else class="turn-label">WAITING FOR {{ getPlayerName(gameState.currentTurn).toUpperCase() }}...</span>
     </div>
@@ -203,10 +204,17 @@ function handleIncomeConfirm(payouts: Record<string, number>) {
   padding: 0.6rem 1.25rem;
   background: #0f0b08;
   border-bottom: 1px solid #3d2a0e;
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
+}
+
+.round-label {
+  color: #6b5a3e;
+  font-family: 'Cinzel', serif;
 }
 
 .turn-label {
