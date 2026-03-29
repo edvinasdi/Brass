@@ -261,6 +261,14 @@ export class GameState {
     this.game.roundEnded = false;
     this.game.currentTurnActionHistory = [];
 
+    // Log each player's spent before reordering
+    const spentSummary = this.game.turnOrder
+      .map((id) => this.game.players.find((p) => p.playerId === id))
+      .filter(Boolean)
+      .map((p) => `  ${p!.name}: £${p!.spent}`)
+      .join("\n");
+    console.log(`[END ROUND ${this.game.round}] Spent this round:\n${spentSummary}`);
+
     // Sort by spent ascending (least spent goes first next round) before resetting.
     // Tiebreak: preserve current round's turn order position.
     const players = [...this.game.players].sort((a, b) => {
