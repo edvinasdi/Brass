@@ -220,7 +220,7 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
       }
       for (const p of gameState.getGame().players) {
         const amount = payouts[p.playerId];
-        if (!Number.isInteger(amount) || amount < 0) {
+        if (!Number.isInteger(amount)) {
           socket.emit("REJECT_ACTION", { reason: `Invalid payout for ${p.name}` });
           return;
         }

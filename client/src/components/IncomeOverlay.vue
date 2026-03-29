@@ -18,6 +18,7 @@
     </div>
 
     <div class="io-numpad-wrap">
+      <button class="io-toggle-btn" @click="pressToggle">+/−</button>
       <Numpad
         action-label="→"
         action-variant="advance"
@@ -75,21 +76,32 @@ function entrepreneurColor(e: Entrepreneur | null): string {
   return e ? ENTREPRENEUR_COLORS[e] : "#666";
 }
 
+function pressToggle() {
+  if (!selectedId.value) return;
+  const current = inputs.value[selectedId.value] ?? "";
+  if (current === "" || current === "0") return;
+  const toggled = current.startsWith("-") ? current.slice(1) : "-" + current;
+  inputs.value = { ...inputs.value, [selectedId.value]: toggled };
+}
+
 function pressDigit(d: number) {
   if (!selectedId.value) return;
   const current = inputs.value[selectedId.value] ?? "";
-  if (current.length >= 3) return;
+  const digits = current.replace(/^-/, "");
+  if (digits.length >= 3) return;
   if (current === "" && d === 0) {
     inputs.value = { ...inputs.value, [selectedId.value]: "0" };
     return;
   }
+  if (current === "-" && d === 0) return; // prevent "-0"
   inputs.value = { ...inputs.value, [selectedId.value]: current + String(d) };
 }
 
 function pressBackspace() {
   if (!selectedId.value) return;
   const current = inputs.value[selectedId.value] ?? "";
-  inputs.value = { ...inputs.value, [selectedId.value]: current.slice(0, -1) };
+  const next = current.slice(0, -1);
+  inputs.value = { ...inputs.value, [selectedId.value]: next === "-" ? "" : next };
 }
 
 function pressAdvance() {
@@ -110,7 +122,7 @@ const canConfirm = computed(() =>
     const raw = inputs.value[p.playerId] ?? "";
     if (raw === "") return false;
     const n = Number(raw);
-    return Number.isInteger(n) && n >= 0;
+    return Number.isInteger(n) && p.money + n >= 0;
   })
 );
 
@@ -186,6 +198,29 @@ function confirm() {
 /* numpad styles live in Numpad.vue */
 .io-numpad-wrap {
   margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.io-toggle-btn {
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.06em;
+  background: #1a1612;
+  color: #c9a84c;
+  border: 1px solid #3d2a0e;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 0.1s;
+}
+
+.io-toggle-btn:active {
+  background: #2a2218;
 }
 
 /* ── Confirm ────────────────────────────────────────────── */
