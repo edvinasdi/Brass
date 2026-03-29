@@ -8,7 +8,7 @@ html,
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
-  background: #0f0b08;
+  background: #0f0b08 url('/backgrounds/industrial-street-blurred.jpg') center / cover fixed;
   color: #fff;
   height: 100%;
   overflow: hidden;

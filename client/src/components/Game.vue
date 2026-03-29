@@ -205,14 +205,14 @@ function handleIncomeConfirm(payouts: Record<string, number>) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: #0f0b08;
+  background: #0f0b08 url('/backgrounds/industrial-street-blurred.jpg') center / cover fixed;
 }
 
 /* ── Top bar ────────────────────────────────────────────── */
 .top-bar {
   flex-shrink: 0;
   padding: 0.4rem 1.25rem;
-  background: #0f0b08;
+  background: rgba(15, 11, 8, 0.85);
   border-bottom: 1px solid #3d2a0e;
   display: flex;
   flex-direction: column;
