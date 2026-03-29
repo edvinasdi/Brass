@@ -110,6 +110,7 @@ onMounted(() => {
       if (savedVersion && savedVersion !== state.version) {
         localStorage.removeItem("playerName");
         localStorage.removeItem("playerEntrepreneur");
+        localStorage.removeItem("playerPortrait");
         localStorage.setItem("gameVersion", state.version);
         gameVersion.value = state.version;
         gameState.value = state;
@@ -130,6 +131,7 @@ onMounted(() => {
     console.warn("⚠️ Game version mismatch - server has a new game, clearing old player data");
     localStorage.removeItem("playerName");
     localStorage.removeItem("playerEntrepreneur");
+    localStorage.removeItem("playerPortrait");
     localStorage.setItem("gameVersion", payload.version);
     playerId.value = "";
   });
@@ -181,11 +183,12 @@ function handleJoin(playerName: string) {
   }
 }
 
-function handleClaimEntrepreneur(entrepreneur: string) {
+function handleClaimEntrepreneur(entrepreneur: string, portrait: 1 | 2) {
   try {
-    console.log("Claiming entrepreneur:", entrepreneur);
+    console.log("Claiming entrepreneur:", entrepreneur, "portrait:", portrait);
     localStorage.setItem("playerEntrepreneur", entrepreneur);
-    socket.emit("CLAIM_ENTREPRENEUR", { entrepreneur });
+    localStorage.setItem("playerPortrait", String(portrait));
+    socket.emit("CLAIM_ENTREPRENEUR", { entrepreneur, portrait });
   } catch (err) {
     console.error("Error during claim:", err);
     error.value = "Failed to claim entrepreneur";

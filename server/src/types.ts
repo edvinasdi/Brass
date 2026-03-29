@@ -1,4 +1,4 @@
-export type Entrepreneur = "red" | "blue" | "yellow" | "purple";
+export type Entrepreneur = "red" | "purple" | "yellow" | "gray";
 export type Phase = "canal" | "rail";
 export type ActionType = "SPEND" | "LOAN" | "LOAN_REQUEST" | "UNDO" | "END_ROUND";
 
@@ -7,6 +7,7 @@ export interface Player {
   socketId: string;
   name: string;
   entrepreneur: Entrepreneur | null;
+  portrait: 1 | 2;
   money: number;
   spent: number;
   connected: boolean;

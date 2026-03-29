@@ -37,15 +37,15 @@ export function setupSocketHandlers(io: Server, gameState: GameState): void {
       io.emit("STATE_UPDATE", gameState.getGame());
     });
 
-    socket.on("CLAIM_ENTREPRENEUR", (payload: { entrepreneur: Entrepreneur }) => {
-      const { entrepreneur } = payload;
+    socket.on("CLAIM_ENTREPRENEUR", (payload: { entrepreneur: Entrepreneur; portrait?: 1 | 2 }) => {
+      const { entrepreneur, portrait = 1 } = payload;
       const player = gameState.getPlayerBySocketId(socket.id);
       if (!player) {
         socket.emit("REJECT_ACTION", { reason: "Player not found" });
         return;
       }
 
-      const success = gameState.claimEntrepreneur(player.playerId, entrepreneur);
+      const success = gameState.claimEntrepreneur(player.playerId, entrepreneur, portrait);
 
       if (!success) {
         socket.emit("REJECT_ACTION", { reason: "Entrepreneur already taken" });

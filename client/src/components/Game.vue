@@ -40,7 +40,13 @@
         :style="player.playerId === gameState.currentTurn ? { borderColor: entrepreneurColor(player.entrepreneur), borderWidth: '2px', borderStyle: 'solid' } : {}"
       >
         <div class="card-left">
-          <span class="entrepreneur-dot" :style="{ background: entrepreneurColor(player.entrepreneur) }"></span>
+          <img
+            v-if="player.entrepreneur"
+            :src="`/entrepreneurs/${player.entrepreneur}-${player.portrait}.png`"
+            class="entrepreneur-portrait"
+            :alt="player.entrepreneur"
+          />
+          <span v-else class="entrepreneur-portrait entrepreneur-portrait--empty"></span>
           <div class="player-name-block">
             <span class="player-name">{{ player.name.toUpperCase() }}</span>
             <span class="player-money">£ {{ player.money }}</span>
@@ -162,9 +168,9 @@ const myBalance = computed(() => {
 
 const ENTREPRENEUR_COLORS: Record<Entrepreneur, string> = {
   red: "#e8453c",
-  blue: "#3a86ff",
-  yellow: "#f4a62a",
   purple: "#9b5de5",
+  yellow: "#f4a62a",
+  gray: "#888888",
 };
 
 function entrepreneurColor(e: Entrepreneur | null): string {
@@ -267,11 +273,17 @@ function handleIncomeConfirm(payouts: Record<string, number>) {
   gap: 0.75rem;
 }
 
-.entrepreneur-dot {
-  width: 10px;
-  height: 10px;
+.entrepreneur-portrait {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
+  object-fit: cover;
   flex-shrink: 0;
+}
+
+.entrepreneur-portrait--empty {
+  background: #3d2a0e;
+  display: inline-block;
 }
 
 .player-name-block {

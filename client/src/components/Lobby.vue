@@ -3,6 +3,28 @@
     <h1>Brass: Birmingham</h1>
     <h2>Money Tracker</h2>
 
+    <BottomSheet
+      :visible="showPortraitPicker"
+      title="CHOOSE YOUR PORTRAIT"
+      @cancel="showPortraitPicker = false"
+    >
+      <div class="portrait-picker">
+        <button
+          v-for="variant in ([1, 2] as const)"
+          :key="variant"
+          class="portrait-option"
+          :class="{ selected: myPortrait === variant }"
+          @click="selectPortrait(variant)"
+        >
+          <img
+            v-if="pendingColor"
+            :src="`/entrepreneurs/${pendingColor}-${variant}.png`"
+            :alt="`Portrait ${variant}`"
+          />
+        </button>
+      </div>
+    </BottomSheet>
+
     <div v-if="!playerJoined" class="join-section">
       <div class="form-group">
         <label>Your Name:</label>
@@ -27,7 +49,13 @@
           :disabled="isTaken(color)"
           @click="claimEntrepreneur(color)"
         >
-          <span class="circle"></span>
+          <img
+            v-if="myEntrepreneur === color"
+            :src="`/entrepreneurs/${color}-${myPortrait}.png`"
+            class="circle"
+            :alt="color"
+          />
+          <span v-else class="circle"></span>
           {{ capitalizeColor(color) }}
         </button>
       </div>
@@ -77,6 +105,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import type { Game, Entrepreneur } from "../types";
+import BottomSheet from "./BottomSheet.vue";
 
 interface Props {
   gameState: Game;
@@ -85,7 +114,7 @@ interface Props {
 
 interface Emits {
   (e: "join", name: string): void;
-  (e: "claim-entrepreneur", entrepreneur: string): void;
+  (e: "claim-entrepreneur", entrepreneur: Entrepreneur, portrait: 1 | 2): void;
   (e: "start-game"): void;
 }
 
@@ -95,19 +124,26 @@ const emit = defineEmits<Emits>();
 const playerName = ref("");
 const playerJoined = ref(false);
 const myEntrepreneur = ref<Entrepreneur | null>(null);
+const myPortrait = ref<1 | 2>(1);
+const showPortraitPicker = ref(false);
+const pendingColor = ref<Entrepreneur | null>(null);
 
-const colors: Entrepreneur[] = ["red", "blue", "yellow", "purple"];
+const colors: Entrepreneur[] = ["red", "purple", "yellow", "gray"];
 
 // On mount, check if we're rejoining an existing player
 onMounted(() => {
   const savedName = localStorage.getItem("playerName");
   const savedEntrepreneur = localStorage.getItem("playerEntrepreneur");
+  const savedPortrait = localStorage.getItem("playerPortrait");
   
   if (savedName) {
     playerName.value = savedName;
     playerJoined.value = true;
     if (savedEntrepreneur) {
       myEntrepreneur.value = savedEntrepreneur as Entrepreneur;
+    }
+    if (savedPortrait === "2") {
+      myPortrait.value = 2;
     }
   }
 });
@@ -119,8 +155,18 @@ function join() {
 }
 
 function claimEntrepreneur(entrepreneur: Entrepreneur) {
-  emit("claim-entrepreneur", entrepreneur);
+  emit("claim-entrepreneur", entrepreneur, 1);
   myEntrepreneur.value = entrepreneur;
+  myPortrait.value = 1;
+  pendingColor.value = entrepreneur;
+  showPortraitPicker.value = true;
+}
+
+function selectPortrait(variant: 1 | 2) {
+  if (!pendingColor.value) return;
+  myPortrait.value = variant;
+  emit("claim-entrepreneur", pendingColor.value, variant);
+  showPortraitPicker.value = false;
 }
 
 function isTaken(entrepreneur: Entrepreneur): boolean {
@@ -234,25 +280,27 @@ h3 {
 }
 
 .entrepreneur-btn .circle {
-  width: 20px;
-  height: 20px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
 }
 
 .color-red .circle {
   background: #e74c3c;
 }
 
-.color-blue .circle {
-  background: #3498db;
+.color-purple .circle {
+  background: #9b59b6;
 }
 
 .color-yellow .circle {
   background: #f39c12;
 }
 
-.color-purple .circle {
-  background: #9b59b6;
+.color-gray .circle {
+  background: #888888;
 }
 
 .entrepreneur-btn:hover:not(:disabled) {
@@ -329,5 +377,40 @@ h4 {
   color: #5a4a30;
   font-size: 0.85rem;
   text-align: center;
+}
+
+.portrait-picker {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 1rem 0 0.5rem;
+}
+
+.portrait-option {
+  background: none;
+  border: 3px solid #3d2a0e;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.portrait-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.portrait-option.selected {
+  border-color: #c9a84c;
+}
+
+.portrait-option:hover {
+  border-color: #a09070;
 }
 </style>

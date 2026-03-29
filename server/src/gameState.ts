@@ -29,6 +29,7 @@ export class GameState {
       currentTurnActionHistory: data.currentTurnActionHistory ?? [],
       gameHistory: data.gameHistory ?? [],
       pendingLoanRequest: data.pendingLoanRequest ?? null,
+      players: ((data.players ?? []) as any[]).map((p) => ({ portrait: 1 as (1 | 2), ...p })) as Player[],
     };
     return state;
   }
@@ -51,6 +52,7 @@ export class GameState {
       socketId, // transient connection ID
       name,
       entrepreneur: null,
+      portrait: 1,
       money: 17, // starting money
       spent: 0,
       connected: true,
@@ -104,7 +106,7 @@ export class GameState {
   }
 
   // Entrepreneur claim
-  claimEntrepreneur(playerId: string, entrepreneur: Entrepreneur): boolean {
+  claimEntrepreneur(playerId: string, entrepreneur: Entrepreneur, portrait: 1 | 2 = 1): boolean {
     const player = this.getPlayer(playerId);
     if (!player) return false;
 
@@ -115,6 +117,7 @@ export class GameState {
     if (isTaken) return false;
 
     player.entrepreneur = entrepreneur;
+    player.portrait = portrait;
     return true;
   }
 
@@ -124,7 +127,7 @@ export class GameState {
         .map((p) => p.entrepreneur)
         .filter((e): e is Entrepreneur => e !== null)
     );
-    return (["red", "blue", "yellow", "purple"] as Entrepreneur[]).filter(
+    return (["red", "purple", "yellow", "gray"] as Entrepreneur[]).filter(
       (e) => !taken.has(e)
     );
   }
